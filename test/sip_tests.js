@@ -19,7 +19,7 @@ test('conf test', (t) => {
 
   Promise.all([connect(srf)])
     .then(() => {
-      t.pass('connected to drachtio and mediaserver');
+      t.pass('connected to dsachtio server, starting call tests');
       return new Promise((resolve, reject) => srf.on('test.complete',
         (countSuccess, countFail) => {
           if (countFail === 0) resolve(countSuccess);

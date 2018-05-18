@@ -17,10 +17,8 @@ srf.on('connect', onSrfConnected);
 function onSrfConnected(err, hp) {
   logger.info(`connected to drachtio: ${hp}`);
   const mrf = new Mrf(srf);
-  logger.info(`attempting connection to freeswitch at ${JSON.stringify(config.get('freeswitch'))}`);
   mrf.connect(config.get('freeswitch'), (err, mediaserver) => {
     if (err) return logger.error(`error connecting to media server: ${err}`);
-    logger.info('connected ok to mediaserver');
     const delay = config.get('callflow.initial-delay');
     logger.info(`connected to media server, waiting ${delay}s..`);
     setTimeout(runScenario.bind(null, mediaserver), delay * 1000);
@@ -60,9 +58,9 @@ function checkCalls(mediaserver, total, limit, rate) {
     return do_shutdown();
   }
   if (currentCalls + countFinished + countStarting >= total) {
-    //if (!reachTotal || !(idx % 60)) {
+    if (!reachTotal || !(idx % 60)) {
       logger.info(`checkCalls: not starting any calls because we have reached our total: ${total}`);
-    //}
+    }
     reachTotal = true;
     return;
   }
