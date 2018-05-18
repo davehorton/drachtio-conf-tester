@@ -1,0 +1,39 @@
+version: '2.1'
+
+networks:
+  conftest:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.32.0.0/16
+
+services:
+  drachtio:
+    image: drachtio/drachtio-server:latest
+    command: drachtio --contact "sip:*;transport=udp" --loglevel info --sofia-loglevel 3
+    ports:
+      - "9026:9022/tcp"
+    networks:
+      conftest:
+        ipv4_address: 172.32.0.2
+
+  freeswitch:
+    image: drachtio/drachtio-freeswitch-mrf:latest
+    command: freeswitch
+    ports:
+      - "8022:8021/tcp"
+    networks:
+      conftest:
+        ipv4_address: 172.32.0.3
+
+  sipp-uas:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas.xml -m 20
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      conftest:
+        ipv4_address: 172.32.0.4
+
+

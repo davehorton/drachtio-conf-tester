@@ -1,0 +1,25 @@
+{
+  "drachtio": {
+    "host": "127.0.0.1",
+    "port": 9021,
+    "secret": "cymru"
+  },
+  "freeswitch": {
+    "address": "127.0.0.1",
+    "port": 8021,
+    "secret": "ClueCon"
+  },
+  "callflow": {
+    "did": "+18005551212",
+    "sbc": "192.168.1.100",
+    "calls": {
+      "total": 500,
+      "rate": 10,
+      "limit": 500
+    },
+    "initial-delay": 5,
+    "pin": "1223456",
+    "pin-entry-delay": 10,
+    "call-duration": 120
+  }
+}
