@@ -13,15 +13,15 @@ The configuration file contains information about the location of the drachtio a
 ```js
   "callflow": {
     "did": "+18005551212", //called party number
-    "sbc": "sipp-uas",     //destination ip addess/DNS
+    "sbc": "192.169.1.100",//destination ip addess/DNS
     "calls": {
-      "total": 10,         // stop after total calls
-      "rate": 2,           // calls per second
-      "limit": 5           // throttle calls in progress to this
+      "total": 1000,       // stop after 1,000 total calls
+      "rate": 15,          // send 15 calls per second
+      "limit": 200         // throttle new calls if we reach 200 in progress
     },
-    "initial-delay": 2,    // delay (secs) before first call
+    "initial-delay": 2,    // wait 2 secs before first call
     "pin": "1223456",      // enter this pin after connecting
-    "pin-entry-delay": 2,  // delay (secs) after connecting before pin
-    "call-duration": 20    // hang up call after secs
+    "pin-entry-delay": 2,  // wait 2 secs after connecting before sending pin
+    "call-duration": 60    // hang up call after 60 secs
   }
 ```
