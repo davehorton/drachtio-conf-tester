@@ -22,8 +22,6 @@
     "promise/no-callback-in-promise": "warn",
     "promise/no-return-in-finally": "warn",
 
-    // Possible Errors
-    // http://eslint.org/docs/rules/#possible-errors
     "comma-dangle": [2, "only-multiline"],
     "no-control-regex": 2,
     "no-debugger": 2,
@@ -46,33 +44,23 @@
     "use-isnan": 2,
     "valid-typeof": 2,
 
-    // Best Practices
-    // http://eslint.org/docs/rules/#best-practices
     "no-fallthrough": 2,
     "no-octal": 2,
     "no-redeclare": 2,
     "no-self-assign": 2,
     "no-unused-labels": 2,
 
-    // Strict Mode
-    // http://eslint.org/docs/rules/#strict-mode
     "strict": [2, "never"],
 
-    // Variables
-    // http://eslint.org/docs/rules/#variables
     "no-delete-var": 2,
     "no-undef": 2,
     "no-unused-vars": [2, {"args": "none"}],
 
-    // Node.js and CommonJS
-    // http://eslint.org/docs/rules/#nodejs-and-commonjs
     "no-mixed-requires": 2,
     "no-new-require": 2,
     "no-path-concat": 2,
     "no-restricted-modules": [2, "sys", "_linklist"],
 
-    // Stylistic Issues
-    // http://eslint.org/docs/rules/#stylistic-issues
     "comma-spacing": 2,
     "eol-last": 2,
     "indent": [2, 2, {"SwitchCase": 1}],
@@ -90,8 +78,6 @@
     "space-infix-ops": 2,
     "space-unary-ops": 2,
 
-    // ECMAScript 6
-    // http://eslint.org/docs/rules/#ecmascript-6
     "arrow-parens": [2, "always"],
     "arrow-spacing": [2, {"before": true, "after": true}],
     "constructor-super": 2,

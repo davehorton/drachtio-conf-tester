@@ -13,13 +13,13 @@
     "did": "+18005551212",
     "sbc": "sipp-uas",
     "calls": {
-      "total": 1,
-      "rate": 1,
-      "limit": 1
+      "total": 10,
+      "rate": 2,
+      "limit": 5
     },
     "initial-delay": 2,
     "pin": "1223456",
     "pin-entry-delay": 2,
-    "call-duration": 30
+    "call-duration": 20
   }
 }

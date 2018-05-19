@@ -69,6 +69,7 @@ function checkCalls(mediaserver, total, limit, rate) {
       logger.info(`checkCalls: not starting any calls because we have reached our limit: ${limit}`);
       throttling = true;
     }
+    return;
   }
 
   logger.info(`starting calls because total: ${total}, calls in progress: ${currentCalls}, finished: ${countFinished}, starting: ${countStarting}`);
@@ -84,12 +85,14 @@ function checkCalls(mediaserver, total, limit, rate) {
       countStart--;
       launchCall(mediaserver)
         .then((obj) => {
+          countStarting--;
           playIvr(obj.ep);
           logger.info(`call started successfully: ${obj.dlg.sip.callId}`);
           return callback.bind(null)();
         })
         .catch((err) => {
           logger.error(err, `checkCalls: failed to create call: ${err}`);
+          countStarting--;
           countFailure++;
         });
     }, msInterval);
@@ -142,6 +145,7 @@ function setDialogHandlers(obj) {
     });
 
   const timerID = setTimeout(() => {
+    logger.info(`hanging up call ${callId}`);
     dlg.destroy();
     callsInProgress.delete(callId);
     countSuccess++;
