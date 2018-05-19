@@ -10,7 +10,7 @@ Create a configuration file at `config/local.json` (review, copy, and edit `conf
 ### Configuration
 The configuration file contains information about the location of the drachtio and freeswitch servers, as well as call variables that govern the scenario.  Those variables are described below:
 
-```json
+```js
   "callflow": {
     "did": "+18005551212", //called party number
     "sbc": "sipp-uas",     //destination ip addess/DNS
