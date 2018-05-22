@@ -35,7 +35,6 @@ let reachTotal = false;
 let throttling = false;
 const conferenceUri = `sip:${config.get('callflow.did')}@${config.get('callflow.sbc')}`;
 process
-  .on('SIGTERM', () => { logger.warn('SIGTERM received.. shutting down..'); do_shutdown(); })
   .on('SIGINT', () => {  logger.warn('SIGINT received.. shutting down..'); do_shutdown(); });
 
 function runScenario(mediaserver) {
@@ -53,10 +52,15 @@ function checkCalls(mediaserver, total, limit, rate) {
   const currentCalls = callsInProgress.size;
   const idx = ++checks;
 
+  if (idx % 10 === 0) {
+    logger.info(`${countSuccess}/${countFailure}/${currentCalls} - success/failure/in progress`);
+  }
+
   if (countFinished >= total) {
     logger.info(`checkCalls: shutting down because total desired calls have been completed: ${countFinished}`);
     return do_shutdown();
   }
+
   if (currentCalls + countFinished + countStarting >= total) {
     if (!reachTotal || !(idx % 60)) {
       logger.info(`checkCalls: not starting any calls because we have reached our total: ${total}`);
@@ -64,7 +68,7 @@ function checkCalls(mediaserver, total, limit, rate) {
     reachTotal = true;
     return;
   }
-  if (currentCalls >= limit) {
+  else if (currentCalls >= limit) {
     if (!throttling) {
       logger.info(`checkCalls: not starting any calls because we have reached our limit: ${limit}`);
       throttling = true;
@@ -72,13 +76,13 @@ function checkCalls(mediaserver, total, limit, rate) {
     return;
   }
 
-  logger.info(`starting calls because total: ${total}, calls in progress: ${currentCalls}, finished: ${countFinished}, starting: ${countStarting}`);
+  logger.debug(`total: ${total}, in progress: ${currentCalls}, finished: ${countFinished}, starting: ${countStarting}`);
 
   // start 'rate' calls evenly spread out over the next second
   let countStart = Math.min(rate, total - countFinished - currentCalls);
   const msInterval = Math.floor(1000 / countStart);
   countStarting += countStart;
-  logger.info(`checkCalls: starting ${countStart} calls with ${msInterval}ms delay`);
+  logger.debug(`checkCalls: starting ${countStart} calls with ${msInterval}ms delay`);
 
   async.doUntil((callback) => {
     setTimeout(() => {
@@ -87,7 +91,7 @@ function checkCalls(mediaserver, total, limit, rate) {
         .then((obj) => {
           countStarting--;
           playIvr(obj.ep);
-          logger.info(`call started successfully: ${obj.dlg.sip.callId}`);
+          logger.debug(`call started successfully: ${obj.dlg.sip.callId}`);
           return callback.bind(null)();
         })
         .catch((err) => {
@@ -119,7 +123,17 @@ function launchCall(mediaserver) {
 }
 
 function playIvr(ep) {
-  return;
+  setTimeout(() => {
+    const pin = config.get('callflow.pin');
+    logger.debug(`playing pin ${pin}`);
+    return ep.execute('send_dtmf', pin)
+      .then((results) => {
+        return ep.execute('playback', 'silence_stream://-1,1400');
+      })
+      .catch((err) => {
+        logger.error(err, 'Error playing pin');
+      });
+  }, config.get('callflow.pin-entry-delay') * 1000);
 }
 
 function setDialogHandlers(obj) {
@@ -128,7 +142,7 @@ function setDialogHandlers(obj) {
 
   dlg
     .on('destroy', () => {
-      logger.info(`${callId}: got unexpected BYE`);
+      logger.warn(`${callId}: got unexpected BYE`);
       const saved = callsInProgress.get(callId);
       if (saved) {
         callsInProgress.delete(callId);
@@ -141,12 +155,13 @@ function setDialogHandlers(obj) {
       res.send(200, { body: ep.local.sdp });
     })
     .on('refresh', (req) => {
-      logger.info(`${dlg.sip.callId}: got refreshing reINVITE`);
+      logger.info(`${callId}: got refreshing reINVITE`);
     });
 
   const timerID = setTimeout(() => {
-    logger.info(`hanging up call ${callId}`);
+    logger.debug(`hanging up call ${callId}`);
     dlg.destroy();
+    ep.destroy();
     callsInProgress.delete(callId);
     countSuccess++;
   }, config.get('callflow.call-duration') * 1000);
@@ -157,23 +172,22 @@ function setDialogHandlers(obj) {
 function do_shutdown() {
   if (intervalID) clearInterval(intervalID);
 
-  if (callsInProgress.size) logger.info('do_shutdown: killing calls');
+  if (callsInProgress.size) logger.info(`do_shutdown: killing ${callsInProgress.size} calls in progress`);
 
-  async.eachSeries(callsInProgress,
-    (item, callback) => {
-      const {dlg, ep} = item[1];
-      countSuccess++;
-      ep.destroy();
-      dlg.destroy(callback);
-    }, (err) => {
-      logger.info(`final stats: ${countSuccess} success, ${countFailure} failure`);
-      if (process.env.NODE_ENV === 'test') {
-        srf.emit('test.complete', countSuccess, countFailure);
-      }
-      else {
-        process.exit(0);
-      }
-    });
+  for (const item of callsInProgress) {
+    const {dlg, ep} = item[1];
+    countSuccess++;
+    ep.destroy();
+    dlg.destroy();
+  }
+
+  logger.info(`final stats: ${countSuccess} success, ${countFailure} failure`);
+  if (process.env.NODE_ENV === 'test') {
+    srf.emit('test.complete', countSuccess, countFailure);
+  }
+  else {
+    setTimeout(() => {process.exit(0);}, 1000);
+  }
 }
 
 module.exports = {srf};

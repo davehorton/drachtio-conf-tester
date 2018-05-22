@@ -28,7 +28,7 @@ services:
 
   sipp-uas:
     image: drachtio/sipp:latest
-    command: sipp -sf /tmp/uas.xml -m 20
+    command: sipp -sf /tmp/uas.xml
     volumes:
       - ./scenarios:/tmp
     tty: true

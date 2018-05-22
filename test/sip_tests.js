@@ -15,7 +15,7 @@ function connect(connectable) {
 
 test('conf test', (t) => {
   const {srf} = require('..');
-  t.timeoutAfter(120000);
+  t.timeoutAfter(180000);
 
   Promise.all([connect(srf)])
     .then(() => {
