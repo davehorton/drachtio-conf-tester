@@ -1,4 +1,4 @@
-# drachtio-conf-tester [![Build Status](https://secure.travis-ci.org/davehorton/drachtio-conf-tester.png)]
+# drachtio-conf-tester ![Build Status](https://secure.travis-ci.org/davehorton/drachtio-conf-tester.png)
 
 A call test generator application, initially developed to load test a conference bridge.
 
@@ -21,7 +21,7 @@ The configuration file contains information about the location of the drachtio a
     },
     "initial-delay": 2,    // wait 2 secs before first call
     "pin": "1223456",      // enter this pin after connecting
-    "pin-entry-delay": 2,  // wait 2 secs after connecting before sending pin
-    "call-duration": 60    // hang up call after 60 secs
+    "pin-entry-delay": 10, // wait 10 secs after connecting before sending pin
+    "call-duration": 300   // hang up call after 300 secs
   }
 ```
