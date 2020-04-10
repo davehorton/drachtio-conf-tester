@@ -6,6 +6,9 @@ const async = require('async');
 const logger = require('pino')();
 //const debug = require('debug')('drachtio:conf-tester');
 
+
+logger.info('Starting load tests');
+
 srf.connect(config.get('drachtio'));
 if (process.env.NODE_ENV !== 'test') {
   srf.on('error', (err) => {
@@ -68,7 +71,7 @@ function checkCalls(mediaserver, total, limit, rate) {
     reachTotal = true;
     return;
   }
-  else if (currentCalls >= limit) {
+  else if (currentCalls = limit) {
     if (!throttling) {
       logger.info(`checkCalls: not starting any calls because we have reached our limit: ${limit}`);
       throttling = true;
@@ -90,7 +93,12 @@ function checkCalls(mediaserver, total, limit, rate) {
       launchCall(mediaserver)
         .then((obj) => {
           countStarting--;
-          playIvr(obj.ep);
+          const application = config.get('callflow.application');
+          if (application == 'prompt') {
+            playPrompt(obj.ep);
+          } else {
+            playIvr(obj.ep);
+          }
           logger.debug(`call started successfully: ${obj.dlg.sip.callId}`);
           return callback.bind(null)();
         })
@@ -134,6 +142,19 @@ function playIvr(ep) {
         logger.error(err, 'Error playing pin');
       });
   }, config.get('callflow.pin-entry-delay') * 1000);
+}
+
+function playPrompt(ep) {
+  logger.debug(`playing prompt for recognition`);
+  setTimeout(() => {
+    return ep.execute('playback', '/usr/local/freeswitch/sounds/testbericht2.wav')
+      .then((results) => {
+        return ep.execute('playback', 'silence_stream://-1,1400');
+      })
+      .catch((err) => {
+        logger.error(err, 'Error playing prompt');
+      });
+  }, config.get('callflow.play-prompt-delay') * 1000);
 }
 
 function setDialogHandlers(obj) {

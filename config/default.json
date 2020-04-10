@@ -18,8 +18,10 @@
       "limit": 500
     },
     "initial-delay": 5,
+    "application": "prompt",
     "pin": "1223456",
     "pin-entry-delay": 10,
+    "play-prompt-delay": 13,
     "call-duration": 120
   }
 }
